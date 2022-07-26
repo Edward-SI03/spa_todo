@@ -57,14 +57,19 @@ router.patch("/todos/:todoId", async (req, res) => {
 
     // 내용 수정
   } else if (value) {
-    await Todo.updateOne({ _id: todoId }, { $set: { value: value } });
+    todo.value = value;
+    // await Todo.updateOne({ _id: todoId }, { $set: { value: value } });
 
     // 완료 여부
-  } else if (done) {
-    await Todo.updateOne({ _id: todoId }, { $set: { doneAt: new Date() } });
-  } else {
-    await Todo.updateOne({ _id: todoId }, { $set: { doneAt: "" } });
+  } else if (done !== undefined) {
+    todo.doneAt = done ? new Date() : null;
   }
+  
+  // } else if (done) {
+  //   await Todo.updateOne({ _id: todoId }, { $set: { doneAt: new Date() } });
+  // } else {
+  //   await Todo.updateOne({ _id: todoId }, { $set: { doneAt: "" } });
+  // }
 
   await todo.save();
 
@@ -75,7 +80,10 @@ router.patch("/todos/:todoId", async (req, res) => {
 router.delete("/todos/:todoId", async (req, res) => {
   const { todoId } = req.params;
 
-  await Todo.deleteOne({ _id: todoId });
+  const todo = await Todo.findById(todoId).exec();
+  await todo.delete();
+
+  // await Todo.deleteOne({ _id: todoId });
 
   res.send({});
 });
